@@ -1,0 +1,21 @@
+{
+  "name": "accessafya",
+  "version": "1.0.0",
+  "description": "GraphQl Api for the frontend team",
+  "main": "apollo server.js",
+  "scripts": {
+    "start": "node \"apollo server.js\"",
+    "dev-server": "nodemon \"apollo server.js\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nahashon Mwongera",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^2.19.0",
+    "graphql": "^15.4.0",
+    "mongodb": "^3.6.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}
