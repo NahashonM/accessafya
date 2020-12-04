@@ -13,5 +13,5 @@ const app = express();
 server.applyMiddleware({ app, path: ['/', '/graphql', '/graphiql'] });
 
 app.listen({ port: serverPort }, () =>
-  console.log(`🚀 Server ready at http://localhost:${serverPort}${server.graphqlPath}`)
+  console.log(`Server started at http://localhost:${serverPort}${server.graphqlPath}`)
 );
