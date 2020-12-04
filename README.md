@@ -1,10 +1,10 @@
-#GraphQL API
+# GraphQL API
 
 GraphQL api to be consumed by the front-end team
-##Usage
+## Usage
 Use `npm run start` to start the server or `npm run dev-server` with nodemon 
 
-####Dependancies
+#### Dependancies
 * nodejs: 14.15.1
 * express: ^4.17.1
 * apollo-server-express: ^2.19.0
