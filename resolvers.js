@@ -1,12 +1,23 @@
 var mongoose = require("mongoose");
 var {staffModel, 
 	locationModel,
-	userModel} = require('./models/models');
+	userModel, 
+	footfallModel,
+	npsModel,
+	revenueModel} = require('./models/models');
 
 const dbName = "db_accessafya";
 const dbPort = 27017;
 const dbUrl = 'localhost';
 const dbLocation = `mongodb://${dbUrl}:${dbPort}/${dbName}`;
+
+
+const count_reported_issues = (staffObject) => {
+	staffObject.forEach(function(staff) {
+		staff.no_of_issues_reported = staff.reported_issues.length;
+	});
+};
+
 
 const resolvers = {
 	Query: {
@@ -50,13 +61,35 @@ const resolvers = {
 				working_location: location_id
 			}).exec();
 
-			return staff;
+			var staffjson = JSON.parse(JSON.stringify(staff));
+			count_reported_issues(staffjson);
+
+			return staffjson;
+		},
+
+		revenue_data: async (_, {period}) => {
+			const revenue = await revenueModel.find({
+				"graph_values.entry_date": period
+			}).exec();
+
+			return revenue;
 
 		},
 
-		graph_values: (root, {location_id, period}) => {
-			// Todo--
-			// Query db
+		patient_sartisfaction_data: async (_, {period}) => {
+			const nps = await npsModel.find({
+				"graph_values.entry_date": period
+			}).exec();
+
+			return nps;
+		},
+
+		footfall_data: async (_, {period}) => {
+			const footfall = await footfallModel.find({
+				"graph_values.entry_date": period
+			}).exec();
+
+			return footfall;
 		}
 	},
 
@@ -73,22 +106,74 @@ const resolvers = {
 
 			await staff.save();
 			
-			return 001;
+			var staffjson = JSON.parse(JSON.stringify(staff));
+			staffjson[0].reported_issues = 0;
+
+			return staff;
 		},
 
-		AddLocation: async (_, { location_name }) => {	
+		AddLocation: async (_, { location_name }) => {
+
 			const location = new locationModel({
 					location_name
 				});
 
 			await location.save();
 			
-			return location.id;
+			return location;
 		},
 
-		UpdateStaffAssessment:(root, args) => {
-			// ToDo----
-			// update db
+		Update_Staff_Efficiency: async (_, {
+			staff_no, efficiency, e_delta, efficiency_percent }) => {
+
+			const staff = await staffModel.findOneAndUpdate(
+				{ _id: staff_no }, 
+				{
+					$set: { 
+						staff_name: staff_no,
+						efficiency: efficiency,
+						efficiency_percentage: efficiency_percent,
+						efficiency_delta: e_delta
+					}
+				}).exec();
+
+			var staffjson = JSON.parse(JSON.stringify(staff));
+			count_reported_issues(staffjson);
+				
+			return staff;
+		},
+
+		Update_Staff_Nps: async (_, { staff_no, nps, nps_delta }) => {
+
+			const staff = await staffModel.findOneAndUpdate(
+				{ _id: staff_no }, 
+				{
+					$set: { 
+						nps,
+						nps_delta
+					}
+				}).exec();
+			
+			var staffjson = JSON.parse(JSON.stringify(staff));
+			count_reported_issues(staffjson);
+
+			return staff;
+		},
+
+		Update_Staff_Work_Location: async (_, { staff_no, working_location_id }) => {
+
+			const staff = await staffModel.findOneAndUpdate(
+				{ _id: staff_no }, 
+				{
+					$set: { 
+						working_location: working_location_id
+					}
+				}).exec();
+			
+			var staffjson = JSON.parse(JSON.stringify(staff));
+			count_reported_issues(staffjson);
+
+			return staff;
 		},
 
 		AddIssue: async (_, {location_id, reporting_staff_no, description, isKeyIssue}) => {
@@ -105,9 +190,9 @@ const resolvers = {
 					}
 				}).exec();
 			
-			console.log(staff);
+			var staffjson = JSON.parse(JSON.stringify(staff));
 
-			return staff;
+			return staffjson.reported_issues;
 		}
 	}
   };

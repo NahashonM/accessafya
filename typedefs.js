@@ -12,8 +12,12 @@ type Query {
 
 	location_staff(location_id: ID!): [ Staff ]
 
-	graph_values(location_id: ID!, period: String): [ Graph_Values ]
+	revenue_data(period: String!): graphData
 
+	# month/ date/year
+	patient_sartisfaction_data(period: String!): graphData
+
+	footfall_data(period: String!): graphData
 }
 
 
@@ -45,36 +49,29 @@ type Query {
 		no_of_issues_reported:	Int
 	}
 
-	type Graph_Values {
-		foot_fall_graph: [Foot_Fall]
-		patient_sartisfaction_graph: [Partient_Sartisfaction]
-		revenue_graph: [Revenue]
+	type Graph_Data_Entries {
+		entry_date:		String
+		value:			Float
 	}
 
-
-	type Foot_Fall {
-		patient_count:	Float
-		patient_cdelta:	Float
-		graph_values:	[ Float ]
+	type graphData {
+		c_value:		Float
+		delta:			Float
+		graph_values:	[ Graph_Data_Entries ]
 	}
 
-	type Partient_Sartisfaction {
-		nps:			Float
-		nps_delta:		Float
-		graph_values:	[ Float ]
-	}
-
-	type Revenue {
-		revenue:		Float
-		revenue_delta:	Float
-		graph_values:	[ Float ]
-	}
 
 	type Key_Issue {
 		description:	String!
 		location_name:	String!
 	}
 
+	type Reported_Issue {
+		_id:			String
+		location_id:	String!
+		description: 	String!
+		is_key:			Boolean
+	}
 
 type Mutation {
 
@@ -82,28 +79,36 @@ type Mutation {
 		staff_no:				String!
 		staff_name:				String!
 		location_id:			String!
-	) : Int
+	) : Staff
 
 	AddLocation (
 		location_name:				String!
-	) : String
+	) : Location
 
-	UpdateStaffAssessment(
-					staff_no:				String!,
-					working_location_id:	Int!
-					efficiency:				Int,
-					e_delta                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               :				Float,
-					nps:					Float,
-					nps_delta:				Float,
-					efficiency_percent:		Float
-		):String
+	Update_Staff_Work_Location(
+		staff_no:				String!,
+		working_location_id:	ID!
+	):Staff
+
+	Update_Staff_Efficiency(
+		staff_no:				String!,
+		efficiency:				Float,
+		e_delta:				Float,
+		efficiency_percent:		Float
+	):Staff
+
+	Update_Staff_Nps(
+		staff_no:				String!,
+		nps:					Float,
+		nps_delta:				Float,
+	):Staff
 
 	AddIssue (
 			location_id:		ID!,
 			reporting_staff_no: ID!,
 			description:		String!,
 			isKeyIssue:			Boolean
-		): Staff
+		): [Reported_Issue]
  }
 
 `;

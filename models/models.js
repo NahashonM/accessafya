@@ -31,10 +31,34 @@ const userschema = mongoose.Schema({
 });
 
 
+const graph_data = mongoose.Schema ({
+	entry_date: {type: Date, default: Date.now},
+	value:		{type:Number , default: 0}
+});
+
+
+const graphSchema = mongoose.Schema ({
+	c_value: 		{type: Number, default: 0},
+	delta:			{type: Number, default: 0},
+	graph_values: 	[graph_data]
+});
+
+
+
 var staffModel = mongoose.model('Staff', staffschema);
 var locationModel = mongoose.model('Location', locationschema);
 var userModel = mongoose.model('User', userschema);
+var footfallModel = mongoose.model('FootFall', graphSchema);
+var npsModel = mongoose.model('PatientSartisfaction', graphSchema);
+var revenueModel = mongoose.model('Revenue', graphSchema);
 
 
 
-module.exports = {staffModel, locationModel, userModel};
+module.exports = {
+	staffModel, 
+	locationModel, 
+	userModel,
+	footfallModel,
+	npsModel,
+	revenueModel
+};
