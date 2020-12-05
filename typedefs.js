@@ -3,43 +3,45 @@ const { gql } = require('apollo-server-express');
 const typeDefs = gql`
 type Query {
 
-	user(user_id: Int!, password: String!): User
+	user(username: String!): User
 
 
 	locations: [ Location ]
 
 	key_issues: [ Key_Issue ]
 
-	location_staff(location_id: Int!): [ Staff ]
+	location_staff(location_id: ID!): [ Staff ]
 
-	graph_values(location_id: Int!, period: String): [ Graph_Values ]
+	graph_values(location_id: ID!, period: String): [ Graph_Values ]
 
 }
 
 
 	type User {
-		id:						Int!
-		name:					String!
+		_id:					ID!
+		first_name:				String
+		last_name:				String
 		email:					String
 		no_of_patients_seen:	Int
-		password_hash:			String
 	}
 
+
 	type Location {
-		id:				Int!
-		name:			String!
+		_id:			ID!
+		location_name:	String!
 		no_of_visits:	Int
 	}
 
 
 	type Staff {
-		staff_no:				Int!
+		# staff number = _id
+		_id:					ID!
 		staff_name:				String!
 		efficiency:				Int
 		efficiency_delta:		Float
+		efficiency_percentage:	Float
 		nps:					Float
 		nps_delta:				Float
-		efficiency_percent:		Float
 		no_of_issues_reported:	Int
 	}
 
@@ -75,21 +77,33 @@ type Query {
 
 
 type Mutation {
+
+	AddStaff (
+		staff_no:				String!
+		staff_name:				String!
+		location_id:			String!
+	) : Int
+
+	AddLocation (
+		location_name:				String!
+	) : String
+
 	UpdateStaffAssessment(
-					staff_no:			Int!,
-					efficiency:			Int,
-					e_delta:			Float,
-					nps:				Float,
-					nps_delta:			Float,
-					efficiency_percent:	Float
+					staff_no:				String!,
+					working_location_id:	Int!
+					efficiency:				Int,
+					e_delta                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               :				Float,
+					nps:					Float,
+					nps_delta:				Float,
+					efficiency_percent:		Float
 		):String
 
 	AddIssue (
-			location_id:		Int!,
-			reporting_staff_no: Int!,
+			location_id:		ID!,
+			reporting_staff_no: ID!,
 			description:		String!,
 			isKeyIssue:			Boolean
-		): String
+		): Staff
  }
 
 `;
