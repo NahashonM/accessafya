@@ -67,29 +67,43 @@ const resolvers = {
 			return staffjson;
 		},
 
-		revenue_data: async (_, {period}) => {
-			const revenue = await revenueModel.find({
-				"graph_values.entry_date": period
-			}).exec();
+		graph_data: async (_, {graph, from, to}) => {
+			var data;
 
-			return revenue;
+			var date_filter = 	{"$match": {
+									'graph_values.entry_date': {
+											$gte: new Date(from),
+											$lte: new Date(to)
+										}}};
+			var field_filter =	{"$project":{
+									"_id":"$_id",
+									"c_value": "$c_value",
+    								"delta": "$delta",
+									"entry_date":"$graph_values.entry_date",
+									"value":"$graph_values.value",
+								}};
 
-		},
+			var group_data = { $group:{
+								_id: {_id: '$_id', c_value: '$c_value', delta: '$delta'},
+								values:{ $push:{entry_date:'$entry_date',value:'$value'}}}
+							};
+			var merge_data = {"$project": {
+									"_id": "$_id._id",
+									"c_value": "$_id.c_value",
+									"delta": "$_id.delta",
+									"graph_values":"$values"
+							  }};
+			var pipeline = [{"$unwind":"$graph_values"}, date_filter, field_filter, group_data, merge_data];
 
-		patient_sartisfaction_data: async (_, {period}) => {
-			const nps = await npsModel.find({
-				"graph_values.entry_date": period
-			}).exec();
+			if (graph == "revenue"){
+				data = await revenueModel.aggregate( pipeline ).exec();
+			}else if(graph == "nps"){
+				data = await npsModel.aggregate( pipeline ).exec();
+			}else if(graph == "footfall"){
+				data = await footfallModel.aggregate( pipeline ).exec();
+			}
 
-			return nps;
-		},
-
-		footfall_data: async (_, {period}) => {
-			const footfall = await footfallModel.find({
-				"graph_values.entry_date": period
-			}).exec();
-
-			return footfall;
+			return JSON.parse(JSON.stringify(data))[0];
 		}
 	},
 
@@ -193,7 +207,68 @@ const resolvers = {
 			var staffjson = JSON.parse(JSON.stringify(staff));
 
 			return staffjson.reported_issues;
+		}, 
+
+		AddUser : async (_, {username, first_name, last_name, email}) => {
+
+			const staff = new staffModel(
+				{
+					_id: username,	first_name,	last_name, email
+				});
+			
+			await staff.save();
+
+			return staff;
+		},
+
+		AddGraphValue : async (_, {graph, entry_date, value}) => {
+			var data;
+
+			if (graph == "revenue"){
+				data = await revenueModel.updateOne(
+					{_id: 1}, {
+						$push: { 
+							graph_values: { entry_date, value}
+						}
+					}, {upsert : true} ).exec();
+			}else if(graph == "nps"){
+				data = await npsModel.updateOne(
+					{_id: 1}, {
+						$push: { 
+							graph_values: { entry_date, value}
+						}
+					}, {upsert : true} ).exec();
+
+			}else if(graph == "footfall"){
+				data = await footfallModel.updateOne(
+					{_id: 1}, {
+						$push: { 
+							graph_values: { entry_date, value}
+						}
+					}, {upsert : true} ).exec();
+
+			}
+
+			return {entry_date, value};
+		},
+
+		UpdateGraphTotals : async (_, {graph, c_value, delta}) => {
+			var data;
+
+			if (graph == "revenue"){
+				data = await revenueModel.updateOne(
+					{_id: 1}, {c_value, delta }, {upsert : true} ).exec();
+			}else if(graph == "nps"){
+				data = await npsModel.updateOne(
+					{_id: 1}, {c_value, delta }, {upsert : true} ).exec();
+			}else if(graph == "footfall"){
+				data = await footfallModel.updateOne(
+					{_id: 1}, {c_value, delta }, {upsert : true} ).exec();
+			}
+
+			return {c_value, delta};
 		}
+
 	}
   };
   

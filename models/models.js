@@ -38,6 +38,7 @@ const graph_data = mongoose.Schema ({
 
 
 const graphSchema = mongoose.Schema ({
+	_id:			{type: Number, default: 1},
 	c_value: 		{type: Number, default: 0},
 	delta:			{type: Number, default: 0},
 	graph_values: 	[graph_data]

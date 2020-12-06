@@ -12,12 +12,8 @@ type Query {
 
 	location_staff(location_id: ID!): [ Staff ]
 
-	revenue_data(period: String!): graphData
-
-	# month/ date/year
-	patient_sartisfaction_data(period: String!): graphData
-
-	footfall_data(period: String!): graphData
+	# period => month/ date/year
+	graph_data(graph: String!, from: String!, to: String!): graphData
 }
 
 
@@ -109,6 +105,25 @@ type Mutation {
 			description:		String!,
 			isKeyIssue:			Boolean
 		): [Reported_Issue]
+	
+	AddUser (
+			username:				ID!,
+			first_name:				String,
+			last_name:				String,
+			email:					String
+		): User
+	
+	AddGraphValue(
+		graph:				String!
+		entry_date:			String!
+		value:				Float!
+	): Graph_Data_Entries
+
+	UpdateGraphTotals(
+		graph:				String!
+		c_value:			Float!
+		delta:				Float!
+	): graphData
  }
 
 `;
