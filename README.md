@@ -25,7 +25,7 @@ Use <br>
 	`_which_graph_` can be any of the following Strings
 	* revenue
 	* nps
-	* footfall
+	* footfall<br>
 	`from` and `to` are date strings of the form: <br> `mm/dd/yyyy`
 	
 	__Example__ Querying revenue graph values would be<br>
