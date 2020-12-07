@@ -9,7 +9,7 @@ const resolvers = require('./resolvers');
 const dbName = "db_accessafya";
 const dbPassword = 'guzCFQCHuHl3P7T6';
 const dbUrl = `mongodb+srv://user-heroku:${dbPassword}@cluster-x.a4rbp.mongodb.net/${dbName}?retryWrites=true&w=majority`;
-const serverPort = process.env.GRAPHQL_APP_PORT || 4000;
+const serverPort = process.env.PORT || 4000;
 
 
 const StartServer = async () => {
@@ -18,11 +18,7 @@ const StartServer = async () => {
 							typeDefs, 
 							resolvers,
 							introspection: true,
-							playground: {
-								settings: {
-								  ['request.credentials']: 'same-origin',
-								}
-							}
+							playground: true
 						});
 
 	server.applyMiddleware({ app, path: ['/', '/graphql', '/graphiql'] });
