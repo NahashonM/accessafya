@@ -6,8 +6,8 @@ const typeDefs = require('./typedefs');
 const resolvers = require('./resolvers');
 
 const dbName = "db_accessafya";
-const dbPort = 27017;
-const dbUrl = 'localhost';
+const dbPassword = 'guzCFQCHuHl3P7T6';
+const dbUrl = `mongodb+srv://user-heroku:${dbPassword}@cluster-x.a4rbp.mongodb.net/${dbName}?retryWrites=true&w=majority`;
 const serverPort = process.env.GRAPHQL_APP_PORT || 4000;
 
 
@@ -22,16 +22,17 @@ const StartServer = async () => {
 	server.applyMiddleware({ app, path: ['/', '/graphql', '/graphiql'] });
 
 	try {
-		await mongoose.connect( `mongodb://${dbUrl}:${dbPort}/${dbName}`, { useNewUrlParser: true });
+		await mongoose.connect( dbUrl, { useNewUrlParser: true,  useUnifiedTopology: true });
 		console.info(`Connected to database on Worker process: ${process.pid}`)
     } catch (error) {
         console.error(`Connection error: ${error.stack} on Worker process: ${process.pid}`)
         process.exit(1)
 	}
 	
+	
 
 	app.listen({ port: serverPort }, () => {
-		console.log(`Server started at http://localhost:${serverPort}${server.graphqlPath}`)
+		console.log(`Server started on port: ${serverPort} paths: ${server.graphqlPath}`)
 	});
 }
 
