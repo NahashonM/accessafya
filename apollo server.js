@@ -16,7 +16,8 @@ const StartServer = async () => {
 	const server = new ApolloServer({ 
 							typeDefs, 
 							resolvers,
-							playground: true,
+							introspection: true,
+							playground: true
 						});
 
 	server.applyMiddleware({ app, path: ['/', '/graphql', '/graphiql'] });
