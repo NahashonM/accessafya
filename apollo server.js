@@ -1,5 +1,6 @@
 const express = require('express');
 var mongoose = require("mongoose");
+const bodyParser = require('body-parser');
 const { ApolloServer } = require('apollo-server-express');
 
 const typeDefs = require('./typedefs');
@@ -17,10 +18,15 @@ const StartServer = async () => {
 							typeDefs, 
 							resolvers,
 							introspection: true,
-							playground: true
+							playground: {
+								settings: {
+								  ['request.credentials']: 'same-origin',
+								}
+							}
 						});
 
 	server.applyMiddleware({ app, path: ['/', '/graphql', '/graphiql'] });
+	app.use('/graphql', bodyParser.json());
 
 	try {
 		await mongoose.connect( dbUrl, { useNewUrlParser: true,  useUnifiedTopology: true });
